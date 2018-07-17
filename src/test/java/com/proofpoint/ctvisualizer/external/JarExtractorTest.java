@@ -3,8 +3,8 @@ package com.proofpoint.ctvisualizer.external;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,7 +14,8 @@ import java.nio.file.Paths;
 
 public class JarExtractorTest  {
 
-    @Test @Ignore
+    @Test
+    @Disabled
     public void testJarExtractor() throws FileNotFoundException, IOException {
         Path compressedFile = Paths.get(".", "apache-phoenix-4.13.2-cdh5.11.2-bin.tar.gz");
         Path targetFile = Paths.get(".","phoenix-client.jar");
