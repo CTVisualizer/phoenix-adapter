@@ -13,7 +13,7 @@ variables:
 
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
-  - apt install java
+  - apt install openjdk-8-jre-headless -j
 
 build:
   stage: build
