@@ -2,7 +2,7 @@
 # This is the Gradle build system for JVM applications
 # https://gradle.org/
 # https://github.com/gradle/gradle
-image: gradle:alpine
+image: ubuntu:16.04
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
 # is usually a priority over speed in CI environments. Using a fresh
@@ -16,7 +16,7 @@ before_script:
 
 build:
   stage: build
-  script: gradle --build-cache distTar
+  script: ./gradlew --build-cache distTar
   artifacts:
     paths:
         - build/distributions/phoenix-adapter.tar
