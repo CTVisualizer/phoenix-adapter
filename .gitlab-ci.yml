@@ -17,6 +17,10 @@ before_script:
   - apt install openjdk-8-jdk -y
   - apt install npm -y
 
+stages:
+    - build
+    - publish
+
 build:
   stage: build
   script: ./gradlew --build-cache distTar
@@ -30,4 +34,16 @@ build:
     paths:
       - build
       - .gradle
+      
+
+publish:
+  stage: publish
+  script: ./gradlew installDist
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+
 
