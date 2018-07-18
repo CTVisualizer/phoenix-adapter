@@ -14,7 +14,7 @@ variables:
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - apt update
-  - apt install openjdk-8 -y
+  - apt install openjdk-8-jdk -y
 
 build:
   stage: build
