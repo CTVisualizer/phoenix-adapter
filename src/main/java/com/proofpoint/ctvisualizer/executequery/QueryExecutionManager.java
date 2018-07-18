@@ -51,8 +51,8 @@ public class QueryExecutionManager {
             Logger.getLogger("QueryExecutionManager").info("PreparedStatement and ResultSet closed.");
             return output;
         } catch (SQLException | RuntimeException e) {
-            Logger.getLogger("QueryExecutionManager").warning(e.toString());
-            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\"}, {\"type\": \"VARCHAR\"}]}, \"data\":[{\"EXCEPTION\":\"%s\"}]}", e.toString());
+            Logger.getLogger("QueryExecutionManager").warning(e.getMessage());
+            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\"}, {\"type\": \"VARCHAR\"}]}, \"data\":[{\"EXCEPTION\":\"%s\"}]}", e.getMessage());
         }
     }
 

@@ -11,9 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ResultSetConverterModule extends AbstractModule {
 
     @Override
-    protected void configure() {
-
-    }
+    protected void configure() { }
 
     @Provides @Singleton @Named("should-stop-flag")
     AtomicBoolean provideShouldStopFlag() {

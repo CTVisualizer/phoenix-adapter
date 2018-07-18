@@ -9,15 +9,18 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 
 public class ResultSetConverter {
 
     private AtomicBoolean shouldStop;
+    private ConversionBehavior defaultConversionBehavior;
 
     @Inject
-    public ResultSetConverter(@Named("should-stop-flag") AtomicBoolean shouldStop) {
+    public ResultSetConverter(@Named("should-stop-flag") AtomicBoolean shouldStop,
+                              @Named("default-conversion-behavior") ConversionBehavior defaultConversionBehavior) {
         this.shouldStop = shouldStop;
+        this.defaultConversionBehavior = defaultConversionBehavior;
+
     }
 
     Map<String, ConversionBehavior> conversionBehaviors = new HashMap<>();
@@ -28,7 +31,6 @@ public class ResultSetConverter {
 
     public String convert(ResultSet resultSet) {
         try {
-//            Logger.getLogger(this.getClass().getName()).info("Should stop: "+ shouldStop.get());
             StringBuilder builder = new StringBuilder();
             builder.append("{ ");
             builder.append(String.format("\"metadata\": %s, ", convertMetaData(resultSet.getMetaData())));
@@ -109,7 +111,7 @@ public class ResultSetConverter {
                 ConversionBehavior conversionBehavior = conversionBehaviors.get(columnType);
                 value = conversionBehavior.convert(resultSet, columnIndex);
             } else {
-                throw new RuntimeException(String.format("No conversion behavior for column type: %s",columnType));
+                value = defaultConversionBehavior.convert(resultSet, columnIndex);
             }
 
             return String.format("\"%s\": %s", key, value);
