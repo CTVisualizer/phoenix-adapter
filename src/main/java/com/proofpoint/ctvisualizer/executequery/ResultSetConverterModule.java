@@ -18,9 +18,15 @@ public class ResultSetConverterModule extends AbstractModule {
         return new AtomicBoolean(true);
     }
 
+    @Provides @Named("default-conversion-behavior")
+    ConversionBehavior provideDefaultConversionBehavior() {
+        return new NullValueReplacer(new VarcharConversionBehavior());
+    }
+
     @Provides
-    private ResultSetConverter provideResultSetConverter(@Named("should-stop-flag") AtomicBoolean shouldStop) {
-        ResultSetConverter resultSetConverter = new ResultSetConverter(shouldStop);
+    private ResultSetConverter provideResultSetConverter(@Named("should-stop-flag") AtomicBoolean shouldStop,
+                                                         @Named("default-conversion-behavior") ConversionBehavior defaultConversionBehavior) {
+        ResultSetConverter resultSetConverter = new ResultSetConverter(shouldStop, defaultConversionBehavior);
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new VarcharConversionBehavior()));
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new BooleanConversionBehavior()));
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new VarcharArrayConversionBehavior()));
