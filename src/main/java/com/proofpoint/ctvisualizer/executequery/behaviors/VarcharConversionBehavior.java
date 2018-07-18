@@ -15,10 +15,13 @@ public class VarcharConversionBehavior implements ConversionBehavior {
     @Override
     public String convert(ResultSet resultSet, int columnIndex) {
         try {
-            return String.format("\"%s\"",resultSet.getString(columnIndex));
+            return String.format("\"%s\"",escape(resultSet.getString(columnIndex)));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    private String escape(String input) {
+        return input.replaceAll("\\\"", "\\\\\\\"");
     }
 }

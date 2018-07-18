@@ -20,7 +20,7 @@ public class VarcharArrayConversionBehavior implements ConversionBehavior {
             builder.append("[ ");
             String[] values = (String[])resultSet.getArray(columnIndex).getArray();
             for(String value: values) {
-                builder.append(String.format("\"%s\", ", value));
+                builder.append(String.format("\"%s\", ", escape(value)));
             }
             builder.delete(builder.length()-2, builder.length()-1);
             builder.append("]");
@@ -28,6 +28,9 @@ public class VarcharArrayConversionBehavior implements ConversionBehavior {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    private String escape(String input) {
+        return input.replaceAll("\\\"", "\\\\\\\"");
     }
 }

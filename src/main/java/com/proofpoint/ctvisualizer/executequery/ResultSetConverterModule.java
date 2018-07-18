@@ -2,7 +2,11 @@ package com.proofpoint.ctvisualizer.executequery;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.proofpoint.ctvisualizer.executequery.behaviors.*;
+
+import javax.inject.Named;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ResultSetConverterModule extends AbstractModule {
 
@@ -11,9 +15,14 @@ public class ResultSetConverterModule extends AbstractModule {
 
     }
 
+    @Provides @Singleton @Named("should-stop-flag")
+    AtomicBoolean provideShouldStopFlag() {
+        return new AtomicBoolean(true);
+    }
+
     @Provides
-    private ResultSetConverter provideResultSetConverter() {
-        ResultSetConverter resultSetConverter = new ResultSetConverter();
+    private ResultSetConverter provideResultSetConverter(@Named("should-stop-flag") AtomicBoolean shouldStop) {
+        ResultSetConverter resultSetConverter = new ResultSetConverter(shouldStop);
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new VarcharConversionBehavior()));
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new BooleanConversionBehavior()));
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new VarcharArrayConversionBehavior()));

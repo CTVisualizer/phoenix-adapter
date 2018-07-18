@@ -1,12 +1,24 @@
 package com.proofpoint.ctvisualizer.executequery;
 
+import com.google.inject.name.Named;
+
+import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 public class ResultSetConverter {
+
+    private AtomicBoolean shouldStop;
+
+    @Inject
+    public ResultSetConverter(@Named("should-stop-flag") AtomicBoolean shouldStop) {
+        this.shouldStop = shouldStop;
+    }
 
     Map<String, ConversionBehavior> conversionBehaviors = new HashMap<>();
 
@@ -16,6 +28,7 @@ public class ResultSetConverter {
 
     public String convert(ResultSet resultSet) {
         try {
+//            Logger.getLogger(this.getClass().getName()).info("Should stop: "+ shouldStop.get());
             StringBuilder builder = new StringBuilder();
             builder.append("{ ");
             builder.append(String.format("\"metadata\": %s, ", convertMetaData(resultSet.getMetaData())));
@@ -70,6 +83,9 @@ public class ResultSetConverter {
 
     private String convertRow(ResultSet resultSet) {
         try {
+            if (shouldStop.get()) {
+                throw new RuntimeException("Stopped Execution");
+            }
             StringBuilder builder = new StringBuilder();
             builder.append("{ ");
             int numColumns = resultSet.getMetaData().getColumnCount();

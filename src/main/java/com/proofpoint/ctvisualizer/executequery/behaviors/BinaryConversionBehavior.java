@@ -14,8 +14,7 @@ public class BinaryConversionBehavior implements ConversionBehavior {
     @Override
     public String convert(ResultSet resultSet, int columnIndex) {
         try {
-            byte[] binaryBytes = resultSet.getBytes(columnIndex);
-            return "";
+            return String.format("\"%s\"",resultSet.getString(columnIndex));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

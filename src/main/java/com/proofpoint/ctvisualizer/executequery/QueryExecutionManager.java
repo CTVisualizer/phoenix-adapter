@@ -3,23 +3,28 @@ package com.proofpoint.ctvisualizer.executequery;
 import com.proofpoint.ctvisualizer.PhoenixHelper;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 public class QueryExecutionManager {
 
     private PhoenixHelper phoenixHelper;
     private ResultSetConverter converter;
+    private AtomicBoolean shouldStop;
     private Connection connection;
     private PreparedStatement currentStatement;
+    private ResultSet currentResultSet;
 
     @Inject
-    public QueryExecutionManager(PhoenixHelper phoenixHelper, ResultSetConverter converter) {
+    public QueryExecutionManager(PhoenixHelper phoenixHelper, ResultSetConverter converter, @Named("should-stop-flag") AtomicBoolean shouldStop) {
         this.phoenixHelper = phoenixHelper;
         this.converter = converter;
+        this.shouldStop = shouldStop;
         initializeConnection();
     }
 
@@ -33,23 +38,30 @@ public class QueryExecutionManager {
 
     public String executeQuery(String query) {
         try {
-            Logger.getGlobal().info("Received query: " + query);
+            shouldStop.set(false);
+            Logger.getLogger("QueryExecutionManager").info("Received query: " + query);
             currentStatement = connection.prepareStatement(query);
-            ResultSet rs = currentStatement.executeQuery();
-            String output = converter.convert(rs);
+            Logger.getLogger("QueryExecutionManager").info("PreparedStatement created.");
+            currentResultSet = currentStatement.executeQuery();
+            Logger.getLogger("QueryExecutionManager").info("ResultSet created.");
+            String output = converter.convert(currentResultSet);
+            Logger.getLogger("QueryExecutionManager").info("ResultSet converted.");
             currentStatement.close();
-            rs.close();
+            currentResultSet.close();
+            Logger.getLogger("QueryExecutionManager").info("PreparedStatement and ResultSet closed.");
             return output;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        } catch (SQLException | RuntimeException e) {
+            Logger.getLogger("QueryExecutionManager").warning(e.toString());
+            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\"}, {\"type\": \"VARCHAR\"}]}, \"data\":[{\"EXCEPTION\":\"%s\"}]}", e.toString());
         }
     }
 
     public String stop() {
         try {
+            shouldStop.set(true);
             currentStatement.close();
-            return "Stopped query.";
+            currentResultSet.close();
+            return "Stopped query.\n";
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -65,7 +77,5 @@ public class QueryExecutionManager {
         } catch (SQLException e) {
             return "Not Healthy.";
         }
-
-
     }
 }
