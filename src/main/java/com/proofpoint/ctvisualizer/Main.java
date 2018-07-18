@@ -2,34 +2,34 @@ package com.proofpoint.ctvisualizer;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.proofpoint.ctvisualizer.cliparser.CLIParserModule;
 import com.proofpoint.ctvisualizer.executequery.QueryExecutionManager;
 import com.proofpoint.ctvisualizer.executequery.ResultSetConverterModule;
-
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static spark.Spark.*;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
-        Path phoenixClient = Paths.get(".","lib", "phoenix-client.jar");
-
-        Injector injector = Guice.createInjector(new ResultSetConverterModule());
+        Injector injector = Guice.createInjector(new ResultSetConverterModule(), new CLIParserModule(args));
 
         PhoenixClientLoader loader = injector.getInstance(PhoenixClientLoader.class);
-        QueryExecutionManager executionManager = injector.getInstance(QueryExecutionManager.class);
+        loader.loadPhoenixClient();
 
-        loader.loadPhoenixClient(phoenixClient);
+        QueryExecutionManager executionManager = injector.getInstance(QueryExecutionManager.class);
 
         port(8080);
         get("/execute/:query", (request, response) -> {
             response.type("application/json");
             return executionManager.executeQuery(request.params("query"));
         });
-        get("/hello",(req, res) -> "Hello World");
+        get("/health", (request, response) -> executionManager.health());
+        delete("/stop", (request, response) -> executionManager.stop());
+        delete("/kill", (request, response) -> {
+            stop();
+            return "Stopped";
+        });
     }
 
 }

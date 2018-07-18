@@ -5,9 +5,11 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 
+import javax.inject.Named;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
 
 public class PhoenixHelper
@@ -19,9 +21,8 @@ public class PhoenixHelper
     private PhoenixConfig config;
 
     @Inject
-    public PhoenixHelper(PhoenixConfig phoenixConfig) {
+    public PhoenixHelper(PhoenixConfig phoenixConfig, @Named("params") Map<String, String> params) {
         this.config = phoenixConfig;
-
 
         this.props.setProperty("hbase.client.write.buffer", phoenixConfig.getHBaseClientWriteBuffer());
         this.props.setProperty("zookeeper.session.timeout", phoenixConfig.getHBaseZookeeperTimeout());
@@ -34,11 +35,11 @@ public class PhoenixHelper
         this.props.setProperty("phoenix.client.maxMetaDataCacheSize",
                 phoenixConfig.getPhoenixClientMaxMetaDataCacheSize());
 
-        String zkQuorum = phoenixConfig.getZkQuorum();
-        String zkPort = phoenixConfig.getZkPort();
-        String hbaseNode = phoenixConfig.getZkHbaseNode();
-        String principalUser = phoenixConfig.getPrincipalName();
-        String keytabFile = phoenixConfig.getKeyTabLocation();
+        String zkQuorum = params.get("quorum");
+        String zkPort = params.get("port");
+        String hbaseNode = params.get("hbaseNode");
+        String principalUser = params.get("principal");
+        String keytabFile = params.get("keytab");
         int maxConnectionPoolSize = phoenixConfig.getMaxConnectionPoolSize();
         long connectionTimeout = phoenixConfig.getConnectionTimeout();
 

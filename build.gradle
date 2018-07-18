@@ -1,22 +1,17 @@
+
+
 buildscript {
     repositories {
         mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.3.RELEASE")
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
 
-bootJar {
-    baseName = 'gs-rest-service'
-    version =  '0.1.0'
-}
+mainClassName = "com.proofpoint.ctvisualizer.Main"
 
 repositories {
     mavenCentral()
@@ -24,8 +19,6 @@ repositories {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
-
 
 dependencies {
 
@@ -42,9 +35,6 @@ dependencies {
     // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
     compile group: 'com.zaxxer', name: 'HikariCP', version: '3.2.0'
 
-    compile(group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1') {
-        force = true
-    }
 
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.2.0'
