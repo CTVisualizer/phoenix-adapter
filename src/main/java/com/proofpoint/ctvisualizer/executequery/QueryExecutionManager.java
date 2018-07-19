@@ -1,6 +1,7 @@
 package com.proofpoint.ctvisualizer.executequery;
 
 import com.proofpoint.ctvisualizer.PhoenixHelper;
+import spark.Response;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,7 +39,7 @@ public class QueryExecutionManager {
         }
     }
 
-    public String executeQuery(String query) {
+    public String executeQuery(String query, Response response) {
         try {
             shouldStop.set(false);
             Logger.getLogger("QueryExecutionManager").info("Received query: " + query);
@@ -51,9 +52,11 @@ public class QueryExecutionManager {
             currentStatement.close();
             currentResultSet.close();
             Logger.getLogger("QueryExecutionManager").info("PreparedStatement and ResultSet closed.");
+            response.status(200);
             return output;
         } catch (SQLException | RuntimeException e) {
             Logger.getLogger("QueryExecutionManager").warning(e.getMessage());
+            response.status(550);
             return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\" , \"type\": \"VARCHAR\"}]}, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeQuotes(e.getMessage()));
         }
     }
