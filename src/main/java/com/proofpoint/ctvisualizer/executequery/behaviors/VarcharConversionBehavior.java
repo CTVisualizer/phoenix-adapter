@@ -4,6 +4,7 @@ import com.proofpoint.ctvisualizer.executequery.ConversionBehavior;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import static com.proofpoint.ctvisualizer.Utils.escapeQuotes;
 
 public class VarcharConversionBehavior implements ConversionBehavior {
 
@@ -15,13 +16,9 @@ public class VarcharConversionBehavior implements ConversionBehavior {
     @Override
     public String convert(ResultSet resultSet, int columnIndex) {
         try {
-            return String.format("\"%s\"",escape(resultSet.getString(columnIndex)));
+            return String.format("\"%s\"", escapeQuotes(resultSet.getString(columnIndex)));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private String escape(String input) {
-        return input.replaceAll("\\\"", "\\\\\\\"");
     }
 }
