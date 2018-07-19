@@ -54,7 +54,7 @@ public class QueryExecutionManager {
             return output;
         } catch (SQLException | RuntimeException e) {
             Logger.getLogger("QueryExecutionManager").warning(e.getMessage());
-            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\"}, {\"type\": \"VARCHAR\"}]}, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeQuotes(e.getMessage()));
+            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\" , \"type\": \"VARCHAR\"}]}, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeQuotes(e.getMessage()));
         }
     }
 
