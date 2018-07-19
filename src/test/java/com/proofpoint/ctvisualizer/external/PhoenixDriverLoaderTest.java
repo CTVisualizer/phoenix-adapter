@@ -2,6 +2,8 @@ package com.proofpoint.ctvisualizer.external;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.proofpoint.ctvisualizer.PhoenixConfig;
 import com.proofpoint.ctvisualizer.PhoenixHelper;
 import com.proofpoint.ctvisualizer.cliparser.CLIParserModule;
@@ -17,11 +19,14 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PhoenixDriverLoaderTest {
 
     private PhoenixHelper helper;
+    private Injector injector;
 
     @BeforeAll
     public void initialize() throws Exception {
@@ -31,14 +36,15 @@ public class PhoenixDriverLoaderTest {
         method.setAccessible(true);
         method.invoke(loader, driverFile.toUri().toURL());
         String[] args = new String[] {
-                "-quorum=\"m0091032.cintel.lab.ppops.net,m0091033.cintel.lab.ppops.net,m0091031.cintel.lab.ppops.net\"",
-                "-port=\"2181\"",
-                "-hbaseNode=\"/hbase\"",
-                "-principal=\"coboyle@CINTEL-CDH.PROOFPOINT.COM\"",
-                "-keytab=\"/Users/coboyle/coboyle.keytab\"",
-                "-phoenixClient=\"/Users/coboyle/phoenix-adapter/lib/phoenix-client.jar\""
+                "-quorum=m0091032.cintel.lab.ppops.net,m0091033.cintel.lab.ppops.net,m0091031.cintel.lab.ppops.net",
+                "-port=2181",
+                "-hbaseNode=/hbase",
+                "-principal=coboyle@CINTEL-CDH.PROOFPOINT.COM",
+                "-keytab=/Users/coboyle/coboyle.keytab",
+                "-phoenixClient=/Users/coboyle/phoenix-adapter/lib/phoenix-client.jar"
         };
-        helper = Guice.createInjector(new ResultSetConverterModule(), new CLIParserModule(args)).getInstance(PhoenixHelper.class);
+        injector = Guice.createInjector(new ResultSetConverterModule(), new CLIParserModule(args));
+        helper = injector.getInstance(PhoenixHelper.class);
     }
 
     @Test
@@ -111,11 +117,15 @@ public class PhoenixDriverLoaderTest {
         String sql = "SELECT * FROM threat_annotation";
         Connection connection = helper.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ResultSet keys = preparedStatement.getGeneratedKeys();
+        ResultSet rs = preparedStatement.executeQuery();
+        for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+            Logger.getGlobal().info(rs.getMetaData().getTableName(i));
+        }
 
-        Injector injector = Guice.createInjector(new ResultSetConverterModule());
+        ResultSet primaryKeys = connection.getMetaData().getPrimaryKeys(null, null, "THREAT_ANNOTATION");
         ResultSetConverter converter = injector.getInstance(ResultSetConverter.class);
-
-        System.out.println(converter.convert(keys));
+        AtomicBoolean shouldStop = injector.getInstance(Key.get(AtomicBoolean.class, Names.named("should-stop-flag")));
+        shouldStop.set(false);
+        Logger.getGlobal().info(converter.convert(primaryKeys));
     }
 }

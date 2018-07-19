@@ -55,9 +55,11 @@ public class QueryExecutionManager {
             response.status(200);
             return output;
         } catch (SQLException | RuntimeException e) {
-            Logger.getLogger("QueryExecutionManager").warning(e.getMessage());
+            for(StackTraceElement element: e.getStackTrace()) {
+                Logger.getLogger("QueryExecutionManager").warning(element.toString());
+            }
             response.status(550);
-            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\" , \"type\": \"VARCHAR\"}]}, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeQuotes(e.getMessage()));
+            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\" , \"type\": \"VARCHAR\"}], \"multipleTablesRepresented\": true }, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeQuotes(e.getMessage()));
         }
     }
 

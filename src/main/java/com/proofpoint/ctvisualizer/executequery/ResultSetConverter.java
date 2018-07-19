@@ -1,10 +1,10 @@
 package com.proofpoint.ctvisualizer.executequery;
 
 import com.google.inject.name.Named;
+import com.proofpoint.ctvisualizer.executequery.metadata.MetadataGenerator;
 
 import javax.inject.Inject;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,12 +14,15 @@ public class ResultSetConverter {
 
     private AtomicBoolean shouldStop;
     private ConversionBehavior defaultConversionBehavior;
+    private MetadataGenerator metadataGenerator;
 
     @Inject
     public ResultSetConverter(@Named("should-stop-flag") AtomicBoolean shouldStop,
-                              @Named("default-conversion-behavior") ConversionBehavior defaultConversionBehavior) {
+                              @Named("default-conversion-behavior") ConversionBehavior defaultConversionBehavior,
+                              MetadataGenerator metadataGenerator) {
         this.shouldStop = shouldStop;
         this.defaultConversionBehavior = defaultConversionBehavior;
+        this.metadataGenerator = metadataGenerator;
 
     }
 
@@ -30,42 +33,12 @@ public class ResultSetConverter {
     }
 
     public String convert(ResultSet resultSet) {
-        try {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{ ");
-            builder.append(String.format("\"metadata\": %s, ", convertMetaData(resultSet.getMetaData())));
-            builder.append(String.format("\"data\": %s ", convertQueryData(resultSet)));
-            builder.append("}");
-            return builder.toString();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    private String convertMetaData(ResultSetMetaData resultSetMetaData) {
-        return "{ " +
-                String.format("\"columns\": %s", convertColumnMetaData(resultSetMetaData)) +
-                " }";
-    }
-
-    private String convertColumnMetaData(ResultSetMetaData resultSetMetaData) {
-        try {
-            StringBuilder builder = new StringBuilder();
-            builder.append("[ ");
-            for(int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
-                builder.append("{ ");
-                builder.append(String.format("\"name\": \"%s\", ", resultSetMetaData.getColumnName(i)));
-                builder.append(String.format("\"type\": \"%s\"", resultSetMetaData.getColumnTypeName(i)));
-                builder.append(" }, ");
-            }
-            builder.delete(builder.length()-2, builder.length()-1);
-            builder.append("]");
-            return builder.toString();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
+        StringBuilder builder = new StringBuilder();
+        builder.append("{ ");
+        builder.append(String.format("\"metadata\": %s, ", metadataGenerator.generateMetadata(resultSet)));
+        builder.append(String.format("\"data\": %s ", convertQueryData(resultSet)));
+        builder.append("}");
+        return builder.toString();
     }
 
     private String convertQueryData(ResultSet resultSet) {

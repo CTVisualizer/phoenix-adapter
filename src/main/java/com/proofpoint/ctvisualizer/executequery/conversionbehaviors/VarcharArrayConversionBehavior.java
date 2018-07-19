@@ -1,4 +1,4 @@
-package com.proofpoint.ctvisualizer.executequery.behaviors;
+package com.proofpoint.ctvisualizer.executequery.conversionbehaviors;
 
 import com.proofpoint.ctvisualizer.executequery.ConversionBehavior;
 
