@@ -1,7 +1,12 @@
 package com.proofpoint.ctvisualizer.external;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.proofpoint.ctvisualizer.PhoenixConfig;
 import com.proofpoint.ctvisualizer.PhoenixHelper;
+import com.proofpoint.ctvisualizer.cliparser.CLIParserModule;
+import com.proofpoint.ctvisualizer.executequery.ResultSetConverter;
+import com.proofpoint.ctvisualizer.executequery.ResultSetConverterModule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -25,7 +30,15 @@ public class PhoenixDriverLoaderTest {
         Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
         method.invoke(loader, driverFile.toUri().toURL());
-        helper = new PhoenixHelper(new PhoenixConfig());
+        String[] args = new String[] {
+                "-quorum=\"m0091032.cintel.lab.ppops.net,m0091033.cintel.lab.ppops.net,m0091031.cintel.lab.ppops.net\"",
+                "-port=\"2181\"",
+                "-hbaseNode=\"/hbase\"",
+                "-principal=\"coboyle@CINTEL-CDH.PROOFPOINT.COM\"",
+                "-keytab=\"/Users/coboyle/coboyle.keytab\"",
+                "-phoenixClient=\"/Users/coboyle/phoenix-adapter/lib/phoenix-client.jar\""
+        };
+        helper = Guice.createInjector(new ResultSetConverterModule(), new CLIParserModule(args)).getInstance(PhoenixHelper.class);
     }
 
     @Test
@@ -91,5 +104,18 @@ public class PhoenixDriverLoaderTest {
 //        while(resultSet.next()) {
 //            System.out.println(resultSet.getTimestamp("EVENT_TIME"));
 //        }
+    }
+
+    @Test
+    public void testPrimaryKeys() throws SQLException {
+        String sql = "SELECT * FROM threat_annotation";
+        Connection connection = helper.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ResultSet keys = preparedStatement.getGeneratedKeys();
+
+        Injector injector = Guice.createInjector(new ResultSetConverterModule());
+        ResultSetConverter converter = injector.getInstance(ResultSetConverter.class);
+
+        System.out.println(converter.convert(keys));
     }
 }

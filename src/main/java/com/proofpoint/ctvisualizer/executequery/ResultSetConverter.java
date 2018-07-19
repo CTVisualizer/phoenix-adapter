@@ -105,7 +105,7 @@ public class ResultSetConverter {
     String convertColumn(ResultSet resultSet, int columnIndex) {
         try {
             String columnType = resultSet.getMetaData().getColumnTypeName(columnIndex);
-            String key = resultSet.getMetaData().getColumnName(columnIndex);
+            String key = resultSet.getMetaData().getColumnLabel(columnIndex);
             String value;
             if (conversionBehaviors.containsKey(columnType)) {
                 ConversionBehavior conversionBehavior = conversionBehaviors.get(columnType);
