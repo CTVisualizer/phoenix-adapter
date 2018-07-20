@@ -106,7 +106,7 @@ public class PhoenixDriverLoaderTest {
         Thread t1 = new Thread(r1);
         t1.start();
 
-//        ResultSet resultSet = preparedStatement.executeQuery();
+//        ResultSet resultSet = preparedStatement.execute();
 //        while(resultSet.next()) {
 //            System.out.println(resultSet.getTimestamp("EVENT_TIME"));
 //        }

@@ -22,7 +22,7 @@ public class Main {
         port(8080);
         get("/execute/:query", (request, response) -> {
             response.type("application/json");
-            return executionManager.executeQuery(request.params("query"), response);
+            return executionManager.execute(request.params("query"), response);
         });
         get("/health", (request, response) -> executionManager.health());
         delete("/stop", (request, response) -> executionManager.stop());

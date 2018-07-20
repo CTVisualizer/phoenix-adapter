@@ -39,13 +39,32 @@ public class QueryExecutionManager {
         }
     }
 
-    public String executeQuery(String query, Response response) {
+    public String execute(String query, Response response) {
         try {
             shouldStop.set(false);
             Logger.getLogger("QueryExecutionManager").info("Received query: " + query);
             currentStatement = connection.prepareStatement(query);
             Logger.getLogger("QueryExecutionManager").info("PreparedStatement created.");
-            currentResultSet = currentStatement.executeQuery();
+            boolean hasResults = currentStatement.execute();
+            Logger.getLogger("QueryExecutionManager").info("PreparedStatement executed.");
+            if (hasResults) {
+                return handleQuery(currentStatement.getResultSet(), response);
+            } else {
+                return handleUpdate(currentStatement.getUpdateCount(), response);
+            }
+
+        } catch (SQLException | RuntimeException e) {
+            for(StackTraceElement element: e.getStackTrace()) {
+                Logger.getLogger("QueryExecutionManager").warning(element.toString());
+            }
+            response.status(550);
+            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\" , \"type\": \"VARCHAR\"}], \"multipleTablesRepresented\": true }, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeQuotes(e.getMessage()));
+        }
+    }
+
+    private String handleQuery(ResultSet resultSet, Response response) {
+        try {
+            currentResultSet = resultSet;
             Logger.getLogger("QueryExecutionManager").info("ResultSet created.");
             String output = converter.convert(currentResultSet);
             Logger.getLogger("QueryExecutionManager").info("ResultSet converted.");
@@ -54,12 +73,20 @@ public class QueryExecutionManager {
             Logger.getLogger("QueryExecutionManager").info("PreparedStatement and ResultSet closed.");
             response.status(200);
             return output;
-        } catch (SQLException | RuntimeException e) {
-            for(StackTraceElement element: e.getStackTrace()) {
-                Logger.getLogger("QueryExecutionManager").warning(element.toString());
-            }
-            response.status(550);
-            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\" , \"type\": \"VARCHAR\"}], \"multipleTablesRepresented\": true }, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeQuotes(e.getMessage()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String handleUpdate(int updateCount, Response response) {
+        try {
+            Logger.getLogger("QueryExecutionManager").info(String.format("%d rows updated.", updateCount));
+            currentStatement.close();
+            Logger.getLogger("QueryExecutionManager").info("PreparedStatement and ResultSet closed.");
+            response.status(202);
+            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"UPDATE\" , \"type\": \"VARCHAR\"}], \"multipleTablesRepresented\": true }, \"data\":[{\"UPDATE\":\"%d rows updated.\"}]}", updateCount);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
