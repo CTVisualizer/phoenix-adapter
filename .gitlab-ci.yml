@@ -13,14 +13,14 @@ variables:
 
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
-  - apt install gradle
+  - apt install openjdk-8-jdk
   - apt install npm
 
 build:
   stage: build
   script: 
-    - gradle --build-cache distTar
-    - gradle installDist
+    - ./gradlew --build-cache distTar
+    - ./gradlew installDist
     - cp ./package.json ./build/install/phoenix-adapter
   artifacts:
     paths:
