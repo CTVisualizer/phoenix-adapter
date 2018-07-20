@@ -42,6 +42,7 @@ public class QueryExecutionManager {
     public String execute(String query, Response response) {
         try {
             shouldStop.set(false);
+            response.type("application/json");
             Logger.getLogger("QueryExecutionManager").info("Received query: " + query);
             currentStatement = connection.prepareStatement(query);
             Logger.getLogger("QueryExecutionManager").info("PreparedStatement created.");

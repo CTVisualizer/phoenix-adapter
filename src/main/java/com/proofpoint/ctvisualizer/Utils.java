@@ -1,5 +1,7 @@
 package com.proofpoint.ctvisualizer;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -9,15 +11,7 @@ import java.util.List;
 public class Utils {
 
     public static String escapeStringValue(String input) {
-        return escapeNewlines(escapeQuotes(input));
-    }
-
-    public static String escapeQuotes(String input) {
-        return input.replaceAll("\\\"", "\\\\\\\"");
-    }
-
-    public static String escapeNewlines(String input) {
-        return input.replaceAll("\\\n", "\\\\\n");
+        return StringEscapeUtils.escapeJson(input);
     }
 
     public static List<String> tablesRepresentedBy(ResultSet resultSet) {

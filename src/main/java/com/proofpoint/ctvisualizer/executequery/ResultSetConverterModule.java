@@ -40,7 +40,6 @@ public class ResultSetConverterModule extends AbstractModule {
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new BooleanConversionBehavior()));
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new VarcharArrayConversionBehavior()));
         resultSetConverter.addConversionBehavior(new NullValueReplacer(new DateConversionBehavior()));
-        resultSetConverter.addConversionBehavior(new NullValueReplacer(new BinaryConversionBehavior()));
         return resultSetConverter;
     }
 
