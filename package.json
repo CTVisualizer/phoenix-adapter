@@ -1,0 +1,19 @@
+{
+  "name": "phoenix-adapter",
+  "version": "1.0.0",
+  "description": "Java wrapper for phoenix",
+  "main": "./bin/phoenix-adapter",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/ctvisualizer/phoenix-adapter.git"
+  },
+  "author": "Connor Boyle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/ctvisualizer/phoenix-adapter/issues"
+  },
+  "homepage": "https://gitlab.com/ctvisualizer/phoenix-adapter#README"
+}
