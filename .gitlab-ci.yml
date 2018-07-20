@@ -22,6 +22,7 @@ build:
   script: 
     - ./gradlew --build-cache distTar
     - ./gradlew installDist
+    - ls -la
     - cp ./package.json ./build/install/phoenix-adapter
   artifacts:
     paths:
