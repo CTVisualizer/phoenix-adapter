@@ -20,10 +20,7 @@ public class Main {
         QueryExecutionManager executionManager = injector.getInstance(QueryExecutionManager.class);
 
         port(8080);
-        get("/execute/:query", (request, response) -> {
-            response.type("application/json");
-            return executionManager.execute(request.params("query"), response);
-        });
+        get("/execute/:query", (request, response) -> executionManager.execute(request.params("query"), response));
         get("/health", (request, response) -> executionManager.health());
         delete("/stop", (request, response) -> executionManager.stop());
         delete("/kill", (request, response) -> {

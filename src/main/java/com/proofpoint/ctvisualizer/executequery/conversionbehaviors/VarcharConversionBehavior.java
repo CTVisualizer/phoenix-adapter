@@ -4,7 +4,7 @@ import com.proofpoint.ctvisualizer.executequery.ConversionBehavior;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import static com.proofpoint.ctvisualizer.Utils.escapeBacktick;
+import static com.proofpoint.ctvisualizer.Utils.escapeStringValue;
 
 public class VarcharConversionBehavior implements ConversionBehavior {
 
@@ -16,7 +16,7 @@ public class VarcharConversionBehavior implements ConversionBehavior {
     @Override
     public String convert(ResultSet resultSet, int columnIndex) {
         try {
-            return String.format("`%s`", escapeBacktick(resultSet.getString(columnIndex)));
+            return String.format("\"%s\"", escapeStringValue(resultSet.getString(columnIndex)));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
