@@ -1,6 +1,6 @@
 {
   "name": "phoenix-java-adapter",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Java wrapper for phoenix",
   "main": "./bin/phoenix-adapter",
   "scripts": {
