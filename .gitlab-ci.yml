@@ -23,7 +23,11 @@ build:
     - ./gradlew --build-cache distTar
     - ./gradlew installDist
     - ls -la
+    - npm version patch -m "Updated version"
+    - git push
     - cp ./package.json ./build/install/phoenix-adapter
+    - cd build/install/phoenix-adapter
+    - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
   artifacts:
     paths:
         - build/distributions/phoenix-adapter.tar

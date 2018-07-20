@@ -1,5 +1,5 @@
 {
-  "name": "phoenix-adapter",
+  "name": "phoenix-java-adapter",
   "version": "1.0.0",
   "description": "Java wrapper for phoenix",
   "main": "./bin/phoenix-adapter",
