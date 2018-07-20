@@ -5,7 +5,7 @@ import com.proofpoint.ctvisualizer.executequery.ConversionBehavior;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.proofpoint.ctvisualizer.Utils.escapeQuotes;
+import static com.proofpoint.ctvisualizer.Utils.escapeBacktick;
 
 public class VarcharArrayConversionBehavior implements ConversionBehavior {
 
@@ -22,7 +22,7 @@ public class VarcharArrayConversionBehavior implements ConversionBehavior {
             builder.append("[ ");
             String[] values = (String[])resultSet.getArray(columnIndex).getArray();
             for(String value: values) {
-                builder.append(String.format("\"%s\", ", escapeQuotes(value)));
+                builder.append(String.format("`%s`, ", escapeBacktick(value)));
             }
             builder.delete(builder.length()-2, builder.length()-1);
             builder.append("]");

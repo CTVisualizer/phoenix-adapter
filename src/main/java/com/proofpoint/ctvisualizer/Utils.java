@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Utils {
 
-    public static String escapeQuotes(String input) {
-        return input.replaceAll("\\\"", "\\\\\\\"");
+    public static String escapeBacktick(String input) {
+        return input.replaceAll("`", "\\'");
     }
     public static List<String> tablesRepresentedBy(ResultSet resultSet) {
         try {

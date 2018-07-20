@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import static com.proofpoint.ctvisualizer.Utils.escapeQuotes;
+import static com.proofpoint.ctvisualizer.Utils.escapeBacktick;
 
 public class QueryExecutionManager {
 
@@ -58,7 +58,7 @@ public class QueryExecutionManager {
                 Logger.getLogger("QueryExecutionManager").warning(element.toString());
             }
             response.status(550);
-            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\" , \"type\": \"VARCHAR\"}], \"multipleTablesRepresented\": true }, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeQuotes(e.getMessage()));
+            return String.format("{ \"metadata\": { \"columns\": [ {\"name\": \"EXCEPTION\" , \"type\": \"VARCHAR\"}], \"multipleTablesRepresented\": true }, \"data\":[{\"EXCEPTION\":\"%s\"}]}", escapeBacktick(e.getMessage()));
         }
     }
 
