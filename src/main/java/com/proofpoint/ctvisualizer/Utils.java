@@ -11,7 +11,7 @@ import java.util.List;
 public class Utils {
 
     public static String escapeStringValue(String input) {
-        return StringEscapeUtils.escapeJson(input);
+        return StringEscapeUtils.escapeJson(StringEscapeUtils.escapeHtml4(input));
     }
 
     public static List<String> tablesRepresentedBy(ResultSet resultSet) {
