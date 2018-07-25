@@ -16,7 +16,7 @@ script:
   - cp ./package.json ./build/install/phoenix-adapter
   - cd build/install/phoenix-adapter
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-  - npm publish
+  - npm publish || true
 #artifacts:
 #  paths:
 #      - build/distributions/phoenix-adapter.tar
