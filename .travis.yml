@@ -4,10 +4,10 @@
 
 install:
   - export GRADLE_USER_HOME=`pwd`/.gradle
-  - apt update -y
-  - apt install gradle
-  - apt install openjdk-8-jdk -y
-  - apt install npm -y
+  - sudo apt update -y
+  - sudo apt install gradle
+  - sudo apt install openjdk-8-jdk -y
+  - sudo apt install npm -y
 
 script:
   - ./gradlew --build-cache distTar
