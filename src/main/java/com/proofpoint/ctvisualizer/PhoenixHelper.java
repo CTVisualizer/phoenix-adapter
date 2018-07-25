@@ -15,7 +15,7 @@ import java.util.Properties;
 public class PhoenixHelper
 {
 
-    private String connectionString = "";
+    private String connectionString;
     private Properties props = new Properties();
     private HikariDataSource ds;
     private PhoenixConfig config;
@@ -40,21 +40,8 @@ public class PhoenixHelper
         String hbaseNode = params.get("hbaseNode");
         String principalUser = params.get("principal");
         String keytabFile = params.get("keytab");
-        int maxConnectionPoolSize = phoenixConfig.getMaxConnectionPoolSize();
-        long connectionTimeout = phoenixConfig.getConnectionTimeout();
 
         this.connectionString = String.format("jdbc:phoenix:%s:%s:%s:%s:%s", zkQuorum, zkPort, hbaseNode, principalUser, keytabFile);
-
-        if (phoenixConfig.getPoolConnections()) {
-            HikariConfig config = new HikariConfig();
-            config.setDataSourceProperties(props);
-            config.setJdbcUrl(connectionString);
-            config.setMinimumIdle(5);
-            config.setMaximumPoolSize(maxConnectionPoolSize);
-            config.setConnectionTimeout(connectionTimeout);
-            config.setConnectionTestQuery("select 1");
-            ds = new HikariDataSource(config);
-        }
     }
 
     /**
@@ -75,11 +62,7 @@ public class PhoenixHelper
     public Connection getConnection()
             throws SQLException
     {
-        if (config.getPoolConnections()) {
-            return ds.getConnection();
-        } else {
             return DriverManager.getConnection(this.connectionString, props);
 
-        }
     }
 }

@@ -4,11 +4,6 @@ public class PhoenixConfig {
 
     private String hbaseZookeeperTimeout = "60000";
     private String hbaseClientWriteBuffer = "8388608";
-    private String zkQuorum = "m0091032.cintel.lab.ppops.net,m0091033.cintel.lab.ppops.net,m0091031.cintel.lab.ppops.net";
-    private String zkPort = "2181";
-    private String zkHbaseNode = "/hbase";
-    private String principalName = "coboyle@CINTEL-CDH.PROOFPOINT.COM";
-    private String keyTabLocation = "/Users/coboyle/coboyle.keytab";
     private String hbaseSecurityAuthentication = "kerberos";
     private String hadoopSecurityAuthentication = "kerberos";
     private String hbaseRPCProtection = "privacy";
@@ -17,7 +12,6 @@ public class PhoenixConfig {
     private String hbaseRegionserverPrincipal = "hbase/_HOST@CINTEL-CDH.PROOFPOINT.COM";
     private int maxConnectionPoolSize = 200;
     private long connectionTimeout = 30000;
-    private boolean poolConnections = false;
     private String phoenixClientMaxMetadataCacheSize = "10240000";
 
 
@@ -40,60 +34,6 @@ public class PhoenixConfig {
     public void setHBaseClientWriteBuffer(String clientBuffer)
     {
         this.hbaseClientWriteBuffer = clientBuffer;
-    }
-
-    public String getZkQuorum()
-    {
-        return this.zkQuorum;
-    }
-
-    public void setZkQuorum(String zookeeper)
-    {
-        this.zkQuorum = zookeeper;
-    }
-
-
-    public String getZkPort()
-    {
-        return this.zkPort;
-    }
-
-    public void setZkPort(String port)
-    {
-        this.zkPort = port;
-    }
-
-
-    public String getZkHbaseNode()
-    {
-        return this.zkHbaseNode;
-    }
-
-    public void setZkHbaseNode(String node)
-    {
-        this.zkHbaseNode = node;
-    }
-
-
-    public String getPrincipalName()
-    {
-        return this.principalName;
-    }
-
-    public void setPrincipalName(String name)
-    {
-        this.principalName = name;
-    }
-
-
-    public String getKeyTabLocation()
-    {
-        return this.keyTabLocation;
-    }
-
-    public void setKeyTabLocation(String ticketKeyTab)
-    {
-        this.keyTabLocation = ticketKeyTab;
     }
 
 
@@ -170,17 +110,6 @@ public class PhoenixConfig {
     public void setMaxConnectionPoolSize(int maxConnectionPoolSize)
     {
         this.maxConnectionPoolSize = maxConnectionPoolSize;
-    }
-
-
-    public boolean getPoolConnections()
-    {
-        return this.poolConnections;
-    }
-
-    public void setPoolConnections(boolean flag)
-    {
-        this.poolConnections = flag;
     }
 
     public long getConnectionTimeout()

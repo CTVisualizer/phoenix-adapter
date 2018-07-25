@@ -30,7 +30,7 @@ public class PhoenixDriverLoaderTest {
 
     @BeforeAll
     public void initialize() throws Exception {
-        Path driverFile = Paths.get("phoenix-client.jar");
+        Path driverFile = Paths.get("~", ".ctvisualizer", "drivers", "phoenix-4.13.2-cdh5.11.2-client.jar");
         URLClassLoader loader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
@@ -41,7 +41,7 @@ public class PhoenixDriverLoaderTest {
                 "-hbaseNode=/hbase",
                 "-principal=coboyle@CINTEL-CDH.PROOFPOINT.COM",
                 "-keytab=/Users/coboyle/coboyle.keytab",
-                "-phoenixClient=/Users/coboyle/phoenix-adapter/lib/phoenix-client.jar"
+                "-phoenixClient=/Users/coboyle/.ctvisualizer/drivers/phoenix-4.13.2-cdh5.11.2-client.jar"
         };
         injector = Guice.createInjector(new ResultSetConverterModule(), new CLIParserModule(args));
         helper = injector.getInstance(PhoenixHelper.class);
@@ -127,5 +127,22 @@ public class PhoenixDriverLoaderTest {
         AtomicBoolean shouldStop = injector.getInstance(Key.get(AtomicBoolean.class, Names.named("should-stop-flag")));
         shouldStop.set(false);
         Logger.getGlobal().info(converter.convert(primaryKeys));
+    }
+
+    @Test
+    public void testUpsert() {
+        try {
+            String sql = "UPSERT INTO threat_annotation VALUES('mywebsite.gov', '2018-04-22T22:11:16.354Z', 'url', true, 'this threat is unequivocally malicious', ARRAY['United States', 'China'], ARRAY['HEALTHCARE', 'AGRICULTURE'])";
+            Connection connection = helper.getConnection();
+            connection.setAutoCommit(true);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            int rowsAffected = preparedStatement.executeUpdate();
+            Logger.getGlobal().info(String.format("Rows affected: %d", rowsAffected));
+            Logger.getGlobal().info(String.format("Update count: %s",preparedStatement.getUpdateCount()));
+        } catch (RuntimeException | SQLException e) {
+            for(StackTraceElement element: e.getStackTrace()) {
+                Logger.getLogger("QueryExecutionManager").warning(element.toString());
+            }
+        }
     }
 }

@@ -34,6 +34,7 @@ public class QueryExecutionManager {
     private void initializeConnection() {
         try {
             this.connection = phoenixHelper.getConnection();
+            this.connection.setAutoCommit(true);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -51,7 +52,7 @@ public class QueryExecutionManager {
             if (hasResults) {
                 return handleQuery(currentStatement.getResultSet(), response);
             } else {
-                return handleUpdate(currentStatement.getUpdateCount(), response);
+                return handleMutation(currentStatement.getUpdateCount(), response);
             }
 
         } catch (SQLException | RuntimeException e) {
@@ -79,7 +80,7 @@ public class QueryExecutionManager {
         }
     }
 
-    private String handleUpdate(int updateCount, Response response) {
+    private String handleMutation(int updateCount, Response response) {
         try {
             Logger.getLogger("QueryExecutionManager").info(String.format("%d rows updated.", updateCount));
             currentStatement.close();
