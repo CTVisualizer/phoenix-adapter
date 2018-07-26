@@ -1,6 +1,9 @@
 
-#variables:
-#  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+language: node_js
+
+node_js:
+  - "10.7.0"
+
 
 install:
   - export GRADLE_USER_HOME=`pwd`/.gradle
