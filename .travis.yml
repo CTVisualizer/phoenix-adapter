@@ -19,15 +19,5 @@ script:
   - cd build/install/phoenix-adapter
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
   - npm publish || true
-#artifacts:
-#  paths:
-#      - build/distributions/phoenix-adapter.tar
-#  expire_in: 1 week
-#cache:
-#  key: "$CI_COMMIT_REF_NAME"
-#  policy: push
-#  paths:
-#    - build
-#    - .gradle
 
 
