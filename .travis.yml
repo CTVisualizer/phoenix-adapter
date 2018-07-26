@@ -8,7 +8,6 @@ node_js:
 install:
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - sudo apt update -y
-  - sudo apt install gradle
   - sudo apt install openjdk-8-jdk -y
   - sudo apt install npm -y
 
