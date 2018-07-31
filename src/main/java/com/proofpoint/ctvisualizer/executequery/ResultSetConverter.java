@@ -45,10 +45,14 @@ public class ResultSetConverter {
         try {
             StringBuilder builder = new StringBuilder();
             builder.append("[ ");
+            boolean empty = true;
             while(resultSet.next()) {
+                empty = false;
                 builder.append(String.format("%s, ", convertRow(resultSet)));
             }
-            builder.delete(builder.length()-2, builder.length()-1);
+            if (!empty) {
+                builder.delete(builder.length()-2, builder.length()-1);
+            }
             builder.append("]");
             return builder.toString();
         } catch (SQLException e) {

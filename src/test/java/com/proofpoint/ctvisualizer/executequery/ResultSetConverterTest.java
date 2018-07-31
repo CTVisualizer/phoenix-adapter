@@ -2,12 +2,15 @@ package com.proofpoint.ctvisualizer.executequery;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
 import java.sql.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,13 +24,15 @@ public class ResultSetConverterTest {
     private ResultSet mockResultSet;
     private ResultSetMetaData mockResultSetMetaData;
     private ResultSetConverter resultSetConverter;
+    private AtomicBoolean shouldStopFlag;
 
     @BeforeEach
     public void setup() {
         mockResultSet = mock(ResultSet.class);
         mockResultSetMetaData = mock(ResultSetMetaData.class);
-        Injector injector = Guice.createInjector(new ResultSetConverterModule());
+        Injector injector = Guice.createInjector(new ResultSetConverterTestModule());
         resultSetConverter = injector.getInstance(ResultSetConverter.class);
+        shouldStopFlag = injector.getInstance(Key.get(AtomicBoolean.class, Names.named("should-stop-flag")));
     }
 
     @Test
@@ -93,6 +98,43 @@ public class ResultSetConverterTest {
         assertEquals("\"key\": \"2017-08-22 18:11:16.0\"", result);
     }
 
+    @Test
+    public void testConvertEmptyResultSet() throws SQLException {
+
+        int columnCount = 4;
+        when(mockResultSetMetaData.getColumnCount()).thenReturn(columnCount);
+        when(mockResultSetMetaData.getColumnName(1)).thenReturn("description");
+        when(mockResultSetMetaData.getColumnTypeName(1)).thenReturn("VARCHAR");
+        when(mockResultSetMetaData.getColumnName(2)).thenReturn("event_time");
+        when(mockResultSetMetaData.getColumnTypeName(2)).thenReturn("DATE");
+        when(mockResultSetMetaData.getColumnName(3)).thenReturn("notable");
+        when(mockResultSetMetaData.getColumnTypeName(3)).thenReturn("BOOLEAN");
+        when(mockResultSetMetaData.getColumnName(4)).thenReturn("verticals");
+        when(mockResultSetMetaData.getColumnTypeName(4)).thenReturn("VARCHAR ARRAY");
+
+
+        when(mockResultSet.next()).thenReturn(false);
+        when(mockResultSet.getMetaData()).thenReturn(mockResultSetMetaData);
+
+        shouldStopFlag.set(false);
+        String result = resultSetConverter.convert(mockResultSet);
+        StringBuilder expected = new StringBuilder();
+        expected.append("{ ");
+        expected.append("\"metadata\": { ");
+        expected.append("\"columns\": [ ");
+        expected.append("{ \"name\": \"description\", \"type\": \"VARCHAR\" }, ");
+        expected.append("{ \"name\": \"event_time\", \"type\": \"DATE\" }, ");
+        expected.append("{ \"name\": \"notable\", \"type\": \"BOOLEAN\" }, ");
+        expected.append("{ \"name\": \"verticals\", \"type\": \"VARCHAR ARRAY\" } ");
+        expected.append("] ");
+        expected.append("}, ");
+        expected.append("\"data\": [ ");
+        expected.append("] ");
+        expected.append("}");
+
+        assertEquals(expected.toString(), result);
+    }
+
     @Test @Ignore
     public void testConvertEntireResultSet() throws SQLException {
 
@@ -121,6 +163,8 @@ public class ResultSetConverterTest {
         when(mockResultSet.getMetaData()).thenReturn(mockResultSetMetaData);
 
 
+
+        shouldStopFlag.set(false);
         String result = resultSetConverter.convert(mockResultSet);
         StringBuilder expected = new StringBuilder();
         expected.append("{ ");
